@@ -1,91 +1,115 @@
-(define (domain Drones)
-(:requirements :typing :durative-actions :fluents :duration-inequalities :equality)
-
+(define (domain Delivery)
+(:requirements :strips :typing :numeric-fluents :durative-actions :conditional-effects)
 (:types
-location locatable - object 
-drone - vehicle
-package destination vehicle droneBase - locatable )
+    place locatable - object
+    vehicle truck drone item - locatable
+    drone truck - vehicle
+)
 
 (:predicates
-(at ?o - locatable ?l - location)
-(occupied ?d - drone)
-(available ?d - drone)
-(empty ?d - drone)
-(charged ?d - drone)
-(in ?p - package ?d - drone)
-(delivered ?p - package))
+    (at ?item - locatable ?loc - place)
+    (in ?item - locatable ?v - vehicle)
+    (available ?d - drone)
+    (link ?x ?y - place)
+    (air-link ?x ?y - place)
+)
 
 (:functions
-(time-to-arrive ?from ?to - location ?d - drone)
-(charge-required ?from ?to - location)
-(drone-charge ?d - drone)
-(recharge-time ?d - drone))
+  (drivetime ?x ?y - place)
+  (flighttime ?x ?y - place)
+)
+
+
+(:durative-action LOAD-TRUCK
+  :parameters
+    (?item - item ?truck - truck ?loc - place)
+  :duration (= ?duration 10)
+  :condition
+    (and (over all (at ?truck ?loc))
+         (at start (at ?item ?loc))
+    )
+  :effect
+   (and (at start (not (at ?item ?loc)))
+        (at end (in ?item ?truck))
+   )
+)
+
+(:durative-action UNLOAD-TRUCK
+  :parameters
+   (?item - item ?truck - truck ?loc - place)
+  :duration (= ?duration 10)
+  :condition
+   (and (over all (at ?truck ?loc))
+        (at start (in ?item ?truck))
+   )
+  :effect
+   (and (at start (not (in ?item ?truck)))
+        (at end (at ?item ?loc))
+   )
+)
 
 (:durative-action ATTACH-PACKAGE
-:parameters (?d - drone ?p - package ?l - location ?db - droneBase)
-:duration (= ?duration 1)
-:condition (and
-(at start (available ?d))
-(at start (empty ?d))
-(at start (at ?p ?l))
-(over all (at ?d ?l))
-(over all (at ?db ?l)))
-:effect (and
-(at end (occupied ?d))
-(at end (not (available ?d)))
-(at start (not (empty ?d)))
-(at start (not (at ?p ?l)))
-(at end (in ?p ?d))))
+  :parameters
+   (?item - item ?drone - drone ?loc - place)
+  :duration (= ?duration 10)
+  :condition
+   (and (over all (at ?drone ?loc))
+        (at start (at ?item ?loc))
+	(at start (available ?drone))
+   )
+  :effect
+   (and (at start (not (at ?item ?loc)))
+        (at end (in ?item ?drone))
+	(at start (not (available ?drone)))
+   )
+)
 
 (:durative-action RELEASE-PACKAGE
-:parameters (?d - drone ?p - package ?l - location ?de - destination)
-:duration (= ?duration 0.5)
-:condition (and
-(at start (not (empty ?d)))
-(at start (occupied ?d))
-(over all (at ?de ?l))
-(over all (at ?d ?l)))
-:effect (and
-(at start (not (occupied ?d)))
-(at end (not (in ?p ?d)))
-(at end (at ?p ?l))
-(at end (delivered ?p))
-(at end (empty ?d))))
+  :parameters
+   (?item - item ?drone - drone ?loc - place)
+  :duration (= ?duration 10)
+  :condition
+   (and (over all (at ?drone ?loc))
+        (at start (in ?item ?drone))
+   )
+  :effect
+   (and (at start (not (in ?item ?drone)))
+        (at end (at ?item ?loc))
+	(at start (available ?drone))
+   )
+)
 
-(:durative-action FLY-TO-DESTINATION
-:parameters (?p - package ?d - drone ?from ?to - location)
-:duration (= ?duration (time-to-arrive ?from ?to ?d))
-:condition (and
-(at start (available ?d))
-(over all (not (= ?from ?to)))
-(at start (at ?d ?from)) 
-(over all (in ?p ?d))
-(at start (charged ?d)))
-:effect (and
-(at start (not (at ?d ?from)))
-(at end (not (charged ?d)))
-(at end (at ?d ?to))))
 
-(:durative-action FLY-TO-DRONEBASE
-:parameters (?p - package ?d - drone ?from ?to - location)
-:duration (= ?duration (time-to-arrive ?from ?to ?d))
-:condition (and
-(over all (not (= ?from ?to)))
-(at start (at ?d ?from))
-(over all (not (in ?p ?d))))
-:effect (and
-(at start (not (at ?d ?from)))
-(at end (at ?d ?to))))
 
-(:durative-action RECHARGE-DRONE
-:parameters (?d - drone ?l - location ?db - droneBase)
-:duration (= ?duration (recharge-time ?d))
-:condition (and
-(over all (at ?d ?l))
-(over all (at ?db ?l))
-(at start (available ?d))
-(at start (not (charged ?d))))
-:effect (and
-(at start (not (available ?d)))
-(at end (available ?d))
-(at end (charged ?d)))))
+
+(:durative-action DRIVE-TRUCK
+  :parameters
+   (?truck - truck ?loc-from - place ?loc-to - place)
+  :duration (= ?duration (drivetime ?loc-from ?loc-to))
+  :condition
+   (and (at start (at ?truck ?loc-from))
+        (over all (link ?loc-from ?loc-to))
+   )
+  :effect
+   (and (at start (not (at ?truck ?loc-from)))
+        (at end (at ?truck ?loc-to))
+   )
+)
+
+
+
+(:durative-action FLY-DRONE
+  :parameters
+   (?drone - drone ?loc-from ?loc-to - place)
+  :duration (= ?duration (flighttime ?loc-from ?loc-to))
+  :condition
+   (and (at start (at ?drone ?loc-from))
+        (over all (air-link ?loc-from ?loc-to)))
+  :effect
+   (and (at start (not (at ?drone ?loc-from)))
+        (at end (at ?drone ?loc-to)))
+)
+
+
+
+)
