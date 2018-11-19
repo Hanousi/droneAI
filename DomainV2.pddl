@@ -1,24 +1,27 @@
 (define (domain Delivery)
-(:requirements :strips :typing :numeric-fluents :durative-actions :conditional-effects) 
+(:requirements :strips :typing :numeric-fluents :durative-actions :conditional-effects)
 (:types
     place locatable - object
-    vehicle truck drone item - locatable
+    vehicle truck drone item dronebase - locatable
     drone truck - vehicle
 )
 
-(:predicates 
+(:predicates
     (at ?item - locatable ?loc - place)
     (in ?item - locatable ?v - vehicle)
     (available ?d - drone)
     (link ?x ?y - place)
     (air-link ?x ?y - place)
+    (charging ?d)
+    (droneBaseAvailable ?db)
 )
 
 (:functions
   (drivetime ?x ?y - place)
   (flighttime ?x ?y - place)
+  (chargerequired ?x ?y - place)
+  (chargelevel ?d - drone)
 )
-
 
 (:durative-action LOAD-TRUCK
   :parameters
@@ -79,9 +82,6 @@
    )
 )
 
-
-
-
 (:durative-action DRIVE-TRUCK
   :parameters
    (?truck - truck ?loc-from - place ?loc-to - place)
@@ -96,20 +96,32 @@
    )
 )
 
-
-
-(:durative-action FLY-DRONE
+(:durative-action FLY-TO-DESTINATION
   :parameters
    (?drone - drone ?loc-from ?loc-to - place)
   :duration (= ?duration (flighttime ?loc-from ?loc-to))
   :condition
    (and (at start (at ?drone ?loc-from))
-        (over all (air-link ?loc-from ?loc-to)))
+        (over all (air-link ?loc-from ?loc-to))
+        (at start (> (chargelevel ?d) (*2 (chargerequired ?loc-from ?loc-to)))))
   :effect
    (and (at start (not (at ?drone ?loc-from)))
         (at end (at ?drone ?loc-to)))
 )
 
+(:action RECHARGE-DRONE
+ :parameters
+  (?d - drone ?l - place ?db - droneBase)
+ :condition
+  (and (at start (>100 (chargelevel ?d)))
+       (at start (available ?d))
+       (at start (droneBaseAvailable ?db))
+       (over all (at ?d ?l))
+       (over all (at ?db ?)))
+  :effects
+    (and (at start (not (available ?d)))
+         (at start (not (droneBaseAvailable ?db)))
+         (at start (charging ?d)))
+ )
 
- 
 )
