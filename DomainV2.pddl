@@ -1,12 +1,12 @@
 (define (domain Delivery)
-(:requirements :strips :typing :time :numeric-fluents :durative-actions :conditional-effects) 
+(:requirements :strips :typing :time :numeric-fluents :durative-actions :conditional-effects)
 (:types
     place locatable - object
     vehicle truck drone item dronebase - locatable
     drone truck - vehicle
 )
 
-(:predicates 
+(:predicates
     (at ?item - locatable ?loc - place)
     (in ?item - locatable ?v - vehicle)
     (available ?d - drone)
@@ -23,7 +23,6 @@
   (chargelevel ?d - drone)
   (loadedpackages ?t - truck)
 )
- 
 
 (:durative-action LOAD-TRUCK
   :parameters
@@ -88,9 +87,6 @@
    )
 )
 
-
-
-
 (:durative-action DRIVE-TRUCK
   :parameters
    (?truck - truck ?loc-from - place ?loc-to - place)
@@ -104,8 +100,6 @@
         (at end (at ?truck ?loc-to))
    )
 )
-
-
 
 (:durative-action FLY-DRONE
   :parameters
@@ -126,42 +120,31 @@
   :duration (= ?duration (flighttime ?loc-from ?loc-to))
   :condition
    (and (at start (at ?d ?loc-from))
-	(over all (at ?db ?loc-to))
+	      (over all (at ?db ?loc-to))
         (over all (air-link ?loc-from ?loc-to))
-        (at start (> (chargelevel ?d) (*1 (chargerequired ?loc-from ?loc-to)))))
+        (at start (> (chargelevel ?d) (chargerequired ?loc-from ?loc-to))))
   :effect
    (and (at start (not (at ?d ?loc-from)))
         (at end (at ?d ?loc-to)))
 )
 
-
-(:action RECHARGE-DRONE
+(:durative-action RECHARGE-DRONE
  :parameters
   (?d - drone ?l - place ?db - droneBase)
+ :duration (= ?duration (- 100 (chargelevel ?d))
  :precondition
-      (and (< (chargelevel ?d) 50)
-      (available ?d)
-      (droneBaseAvailable ?db)
-      (at ?d ?l)
-      (at ?db ?l))
+   (and (at start (< (chargelevel ?d) 100))
+        (at start (available ?d))
+        (at start (droneBaseAvailable ?db))
+        (over all (at ?d ?l))
+        (over all (at ?db ?l)))
   :effect
-      (and (not (available ?d))
-      (not (droneBaseAvailable ?db))
-      (charging ?d))
+   (and (at start (not (available ?d)))
+        (at start (not (droneBaseAvailable ?db)))
+        (at start (charging ?d))
+        (increase (chargelevel ?d) (* #t 1)) **NOT SURE ABOUT THIS LINE
+        (at end (available ?d))
+        (at end (droneBaseAvailable ?db))
+        (at end (not (charging ?d))))
  )
-
-(:process CHARGING-DRONE
- :parameters (?d - drone)
- :precondition (and (charging ?d))
- :effect (and (increase (chargelevel ?d) (* #t 1)))
-)
-
-(:event FINISH-CHARGING
- :parameters (?d - drone ?db - dronebase)
- :precondition (= (chargelevel ?d) 100) 
- :effect (and (available ?d)
-         (droneBaseAvailable ?db)
-         (not (charging ?d)))
- )
- 
 )
