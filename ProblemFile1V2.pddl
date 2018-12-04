@@ -26,25 +26,27 @@
     (available drone3)
     (drone-base-available DroneBase1)
     (drone-base-available DroneBase2)
+    
+
 
     (air-link PON blue_street)
     (air-link blue_street PON)
     (air-link PON pink_street)
     (air-link pink_street PON)
-    (air-link blue_street red_street)
-    (air-link red_street blue_street)
-    (air-link blue_street orange_street)
-    (air-link orange_street blue_street)
-    (air-link red_street white_street)
-    (air-link white_street red_street)
-    (air-link pink_street orange_street)
-    (air-link orange_street pink_street)
-    (air-link orange_street yellow_street)
-    (air-link yellow_street orange_street)
-    (air-link green_street turquoise_street)
-    (air-link turquoise_street green_street)
-    (air-link white_street turquoise_street)
-    (air-link turquoise_street white_street)
+    (air-link PON red_street)
+    (air-link red_street PON)
+    (air-link PON orange_street)
+    (air-link orange_street PON)
+    (air-link POS orange_street)
+    (air-link orange_street POS)
+    (air-link POS white_street)
+    (air-link white_street POS)
+    (air-link PON yellow_street)
+    (air-link yellow_street PON)
+    (air-link PON turquoise_street)
+    (air-link turquoise_street PON)
+    (air-link POS turquoise_street)
+    (air-link turquoise_street POS)
     (air-link POS green_street)
     (air-link green_street POS)
 
@@ -54,7 +56,7 @@
     (link PON WH)
     (link WH PON)
 
-
+    (=(loaded-packages truck1) 0) 
 
     (=(flight-time PON blue_street) 10)
     (=(flight-time blue_street PON) 10)
@@ -82,10 +84,10 @@
 
 
 
-    (=(drivetime PON WH) 25)
-    (=(drivetime WH PON) 25)
-    (=(drivetime WH POS) 25)
-    (=(drivetime POS WH) 25)
+    (=(drive-time PON WH) 25)
+    (=(drive-time WH PON) 25)
+    (=(drive-time WH POS) 25)
+    (=(drive-time POS WH) 25)
 
 
     (=(charge-required PON blue_street) 20)
@@ -118,7 +120,7 @@
 )
 
 (:goal
-   (and (at package1 yellow_street)
+   (and (at package1 green_street)
         (at package2 red_street)
 	(at package3 blue_street)
 	(at package4 pink_street)
