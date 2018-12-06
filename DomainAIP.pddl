@@ -44,8 +44,7 @@
   :duration (= ?duration 10)
   :condition
    (and (over all (at ?truck ?loc))
-        (at start (in ?item ?truck))
-	      (at start (> (loaded-packages ?truck) 0)))
+        (at start (in ?item ?truck)))
   :effect
    (and (at start (not (in ?item ?truck)))
         (at end (at ?item ?loc))
