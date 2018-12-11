@@ -2,7 +2,7 @@
 (:requirements :strips :typing :time :numeric-fluents :durative-actions :conditional-effects :equality )
 (:types
     place locatable - object
-    vehicle truck drone item dronebase - locatable
+    vehicle item dronebase - locatable
     drone truck - vehicle
 )
 
