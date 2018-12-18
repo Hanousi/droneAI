@@ -1,8 +1,8 @@
 (define (domain Delivery)
-(:requirements :strips :typing :time :numeric-fluents :durative-actions :conditional-effects)
+(:requirements :strips :typing :time :numeric-fluents :durative-actions :conditional-effects :equality )
 (:types
     place locatable - object
-    vehicle truck drone item dronebase - locatable
+    vehicle item dronebase - locatable
     drone truck - vehicle
 )
 
@@ -44,8 +44,7 @@
   :duration (= ?duration 10)
   :condition
    (and (over all (at ?truck ?loc))
-        (at start (in ?item ?truck))
-	      (at start (> (loaded-packages ?truck) 0)))
+        (at start (in ?item ?truck)))
   :effect
    (and (at start (not (in ?item ?truck)))
         (at end (at ?item ?loc))
@@ -100,7 +99,7 @@
   :condition
    (and (at start (at ?d ?loc-from))
         (over all (air-link ?loc-from ?loc-to))
-        (at start (> (charge-level ?d) (*2 (charge-required ?loc-from ?loc-to)))))
+        (at start (> (charge-level ?d) (* 2 (charge-required ?loc-from ?loc-to)))))
   :effect
    (and (at start (not (at ?d ?loc-from)))
         (at end (at ?d ?loc-to)))
@@ -123,9 +122,9 @@
 (:durative-action RECHARGE-DRONE
  :parameters
   (?d - drone ?l - place ?db - droneBase)
- :duration (= ?duration (- 100 (charge-level ?d))
- :precondition
-   (and (at start (< (charge-level ?d) 100))
+ :duration (= ?duration (- 100 (charge-level ?d)))
+ :condition
+   (and (at start (<= (charge-level ?d) 100))
         (at start (available ?d))
         (at start (drone-base-available ?db))
         (over all (at ?d ?l))
@@ -134,7 +133,7 @@
    (and (at start (not (available ?d)))
         (at start (not (drone-base-available ?db)))
         (at start (charging ?d))
-        (at end (= (charge-level ?d) 100)) **NOT SURE ABOUT THIS LINE (also no loadedpackages in problems files)
+        (at end (assign (charge-level ?d) 100)) 
         (at end (available ?d))
         (at end (drone-base-available ?db))
         (at end (not (charging ?d))))
