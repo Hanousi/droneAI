@@ -1,0 +1,16 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf0 Problem Files description:
+\b0 \
+\
+The first problem file represents the simplest scenario with only five packages which, in the initial state, are all stored in the main warehouse. There is a single truck available which can reach either the North Post Office and the South Post Office. Each post office is provided with with one or two drones, two of them are 100% charged and one is 50% charged, and a drone-base where is possible to recharge drones when they run out of battery and .\
+The destination are eight. Most of them are linked with only one post office, but some of them have a link with both the post offices. In the goal state we have set as destinations of the packages three of the ones connected with the North Post Office (Blue Street, Pink Street and Red Street), one reachable from both the post offices (Turquoise Street) and one linked only with South Post Office (Green Street). We have decided to choose destinations with different type of links in order to see how the planner manages the delivery of the packages from the warehouse first and from the post offices then in divergent situations. \
+\
+The second problem file is a bit more complex because, in this one, we decided to add two extra trucks, five extra packages and to use four post offices instead of two. `Like in the previous problem file, all the trucks can drive to all the post offices and each post office has its own drone-base. However, this time there are six drones in total, charged respectively 100%, 50%, 98%, 75%, 75% and 30%.. \
+The destination points are nine and are all linked with a single post office only. Some of the destination chosen in the goal state are reachable from the North Post Office (Blue Street, Yellow Street and Pink Street), some others from the South Post Office(Turquoise Street and Purple Street), others from the West Post Office (Red Street, White Street and Brown Street) and one from the East Post Office (Back Street). \
+This time, if you look at the initial state, you will notice that not all the packages are stored in the warehouse, but that some of them have already been delivered to a post office, which could be the right one (the one connected with the destination of the package assigned in the goal state) or the wrong one. In the second case, the planner will need to redeliver the packages received by the wrong post offices to the right one.}
